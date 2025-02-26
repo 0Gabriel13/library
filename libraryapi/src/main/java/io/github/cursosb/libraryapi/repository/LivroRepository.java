@@ -1,97 +1,46 @@
 package io.github.cursosb.libraryapi.repository;
 
 import org.springframework.data.domain.Page;
-
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.transaction.annotation.Transactional;
 
 import io.github.cursosb.libraryapi.model.Autor;
 import io.github.cursosb.libraryapi.model.GeneroLivro;
 import io.github.cursosb.libraryapi.model.Livro;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-/**
- * @see LivroRepositoryTest
- */
-public interface LivroRepository extends JpaRepository<Livro, UUID>, JpaSpecificationExecutor<Livro> {
+public interface LivroRepository extends JpaRepository<Livro, UUID> {
+	
+	boolean existsByAutor(Autor autor);
 
-    Page<Livro> findByAutor(Autor autor, Pageable pageable);
-
-    // Query Method
-    // select * from livro where id_autor = id
-    List<Livro> findByAutor(Autor autor);
-
-    // select * from livro where titulo = titulo
-    List<Livro> findByTitulo(String titulo);
-
-    // select * from livro where isbn = ?
+    // Pesquisa por ISBN
     Optional<Livro> findByIsbn(String isbn);
+    Page<Livro> findByIsbn(String isbn, Pageable pageable);
 
-    // select * from livro where titulo = ? and preco = ?
-    List<Livro> findByTituloAndPreco(String titulo, BigDecimal preco);
+    // Pesquisa por título (ignorando maiúsculas e minúsculas)
+    List<Livro> findByTituloIgnoreCaseContaining(String titulo);
+    Page<Livro> findByTituloIgnoreCaseContaining(String titulo, Pageable pageable);
 
-    // select * from livro where titulo = ? or isbn = ?
-    List<Livro> findByTituloOrIsbnOrderByTitulo(String titulo, String isbn);
+    // Pesquisa por gênero
+    List<Livro> findByGenero(GeneroLivro genero);
+    Page<Livro> findByGenero(GeneroLivro genero, Pageable pageable);
 
-    // select * from livro where data_publicacao between ? and ?
-    List<Livro> findByDataPublicacaoBetween(LocalDate inicio, LocalDate fim);
+    // Pesquisa por ano de publicação (convertendo para string)
+    @Query("SELECT l FROM Livro l WHERE FUNCTION('to_char', l.dataPublicacao, 'YYYY') = :ano")
+    List<Livro> findByAnoPublicacao(@Param("ano") String anoPublicacao);
+    
+    @Query("SELECT l FROM Livro l WHERE FUNCTION('to_char', l.dataPublicacao, 'YYYY') = :ano")
+    Page<Livro> findByAnoPublicacao(@Param("ano") String anoPublicacao, Pageable pageable);
 
-    // JPQL -> referencia as entidades e as propriedades
-    // select l.* from livro as l order by l.titulo
-    @Query(" select l from Livro as l order by l.titulo, l.preco ")
-    List<Livro> listarTodosOrdenadoPorTituloAndPreco();
-
-    /**
-     * select a.*
-     * from livro l
-     * join autor a on a.id = l.id_autor
-     */
-    @Query("select a from Livro l join l.autor a ")
-    List<Autor> listarAutoresDosLivros();
-
-    // select distinct l.* from livro l
-    @Query("select distinct l.titulo from Livro l")
-    List<String> listarNomesDiferentesLivros();
-
-    @Query("""
-        select l.genero
-        from Livro l
-        join l.autor a
-        where a.nacionalidade = 'Brasileira'
-        order by l.genero
-    """)
-    List<String> listarGenerosAutoresBrasileiros();
-
-    // named parameters -> parametros nomeados
-    @Query("select l from Livro l where l.genero = :genero order by :paramOrdenacao ")
-    List<Livro> findByGenero(
-            @Param("genero") GeneroLivro generoLivro,
-            @Param("paramOrdenacao") String nomePropriedade
-    );
-
-    // positional parameters
-    @Query("select l from Livro l where l.genero = ?2 order by ?1 ")
-    List<Livro> findByGeneroPositionalParameters(String nomePropriedade, GeneroLivro generoLivro);
-
-    @Modifying
-    @Transactional
-    @Query(" delete from Livro where genero = ?1 ")
-    void deleteByGenero(GeneroLivro genero);
-
-    @Modifying
-    @Transactional
-    @Query(" update Livro set dataPublicacao = ?1 ")
-    void updateDataPublicacao(LocalDate novaData);
-
-    boolean existsByAutor(Autor autor);
+    // Pesquisa por nome do autor
+    @Query("SELECT l FROM Livro l JOIN l.autor a WHERE UPPER(a.nome) LIKE UPPER(CONCAT('%', :nome, '%'))")
+    List<Livro> findByNomeAutorLike(@Param("nome") String nomeAutor);
+    
+    @Query("SELECT l FROM Livro l JOIN l.autor a WHERE UPPER(a.nome) LIKE UPPER(CONCAT('%', :nome, '%'))")
+    Page<Livro> findByNomeAutorLike(@Param("nome") String nomeAutor, Pageable pageable);
 }

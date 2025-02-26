@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import io.github.cursosb.libraryapi.model.GeneroLivro;
@@ -14,9 +13,6 @@ import io.github.cursosb.libraryapi.repository.LivroRepository;
 import io.github.cursosb.libraryapi.security.SecurityService;
 import io.github.cursosb.libraryapi.validator.LivroValidator;
 
-import static io.github.cursosb.libraryapi.repository.specs.LivroSpecs.*;
-
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -43,7 +39,6 @@ public class LivroService {
         repository.delete(livro);
     }
 
-     //isbn, titulo, nome autor, genero, ano de publicação
     public Page<Livro> pesquisa(
             String isbn,
             String titulo,
@@ -53,41 +48,30 @@ public class LivroService {
             Integer pagina,
             Integer tamanhoPagina){
 
-        // select * from livro where isbn = :isbn and nomeAutor =
-
-//        Specification<Livro> specs = Specification
-//                .where(LivroSpecs.isbnEqual(isbn))
-//                .and(LivroSpecs.tituloLike(titulo))
-//                .and(LivroSpecs.generoEqual(genero))
-//                ;
-
-        // select * from livro where 0 = 0
-        Specification<Livro> specs = Specification.where((root, query, cb) -> cb.conjunction() );
-
-        if(isbn != null){
-            // query = query and isbn = :isbn
-            specs = specs.and(isbnEqual(isbn));
-        }
-
-        if(titulo != null){
-            specs = specs.and(tituloLike(titulo));
-        }
-
-        if(genero != null){
-            specs = specs.and(generoEqual(genero));
-        }
-
-        if(anoPublicacao != null){
-            specs = specs.and(anoPublicacaoEqual(anoPublicacao));
-        }
-
-        if(nomeAutor != null){
-            specs = specs.and(nomeAutorLike(nomeAutor));
-        }
-
         Pageable pageRequest = PageRequest.of(pagina, tamanhoPagina);
 
-        return repository.findAll(specs, pageRequest);
+        if (isbn != null) {
+            return repository.findByIsbn(isbn, pageRequest);
+        }
+        
+        if (titulo != null) {
+            return repository.findByTituloIgnoreCaseContaining(titulo, pageRequest);
+        }
+        
+        if (genero != null) {
+            return repository.findByGenero(genero, pageRequest);
+        }
+        
+        if (anoPublicacao != null) {
+            return repository.findByAnoPublicacao(anoPublicacao.toString(), pageRequest);
+        }
+        
+        if (nomeAutor != null) {
+            return repository.findByNomeAutorLike(nomeAutor, pageRequest);
+        }
+
+        // Se nenhum filtro for aplicado, retorna todos os livros paginados
+        return repository.findAll(pageRequest);
     }
 
     public void atualizar(Livro livro) {
