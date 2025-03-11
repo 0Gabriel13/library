@@ -47,6 +47,12 @@ public class CustomAuthenticationProvider implements AuthenticationProvider{
 		
 	}
 	
+	//Personalizando metodo de mensagem personalizada da exceção UsernameNotFoundException
+	//para a resposta "HTTP" na pagina de Login.
+//	private UsernameNotFoundException getErroUsuarioNaoEncontrado() {
+//		return new UsernameNotFoundException("Usuário e/ou senha incorretos!");
+//	}
+	
 	private AuthenticationException getErroUsuarioNaoEncontrado() {
 	    return new BadCredentialsException("Usuário e/ou senha incorretos!");
 	}

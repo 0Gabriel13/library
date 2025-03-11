@@ -17,10 +17,6 @@ import lombok.RequiredArgsConstructor;
 @Getter
 public class CustomAuthentication implements Authentication{
 	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
 	private final Usuario usuario;
 
 	/*
