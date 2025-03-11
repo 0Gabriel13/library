@@ -4,6 +4,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.util.UUID;
 
+//
 /**
  * Interface que fornece um método padrão para gerar URIs de novos recursos.
  */

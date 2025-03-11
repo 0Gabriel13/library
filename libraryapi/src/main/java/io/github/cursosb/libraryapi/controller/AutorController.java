@@ -35,7 +35,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Tag(name = "Autores")
 public class AutorController implements GenericController {
-
+	//
     private final AutorService service;
     private final AutorMapper mapper;
 
@@ -68,6 +68,7 @@ public class AutorController implements GenericController {
         return service
                 .obterPorId(idAutor)
                 .map(autor -> {
+                	// Converte Entidade para DTO e retorna
                     AutorDTO dto = mapper.toDTO(autor);
                     return ResponseEntity.ok(dto);
                 }).orElseGet(() -> ResponseEntity.notFound().build());

@@ -7,7 +7,7 @@ import io.github.cursosb.libraryapi.model.Usuario;
 
 @Mapper(componentModel = "spring")
 public interface UsuarioMapper {
-
-	// Converte DTO para Entidade
+	//
+	// Converte DTO para Entidade(Usuario)
     Usuario toEntity(UsuarioDTO dto);
 }

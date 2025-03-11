@@ -22,7 +22,9 @@ public class UsuarioController {
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasRole('GERENTE')")
     public void salvar(@RequestBody @Valid UsuarioDTO dto){
-        var usuario = mapper.toEntity(dto);
+    	
+    	//Converte um UsuarioDTO em uma entidade Usuario.
+        var usuario = mapper.toEntity(dto); 
         service.salvar(usuario);
     }
 }
