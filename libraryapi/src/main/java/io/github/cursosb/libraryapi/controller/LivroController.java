@@ -21,12 +21,17 @@ import io.github.cursosb.libraryapi.controller.mappers.LivroMapper;
 import io.github.cursosb.libraryapi.model.GeneroLivro;
 import io.github.cursosb.libraryapi.model.Livro;
 import io.github.cursosb.libraryapi.service.LivroService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/livros")
 @RequiredArgsConstructor
+@Tag(name = "Livros")
 public class LivroController implements GenericController {
 
     private final LivroService service;
@@ -34,6 +39,21 @@ public class LivroController implements GenericController {
 
     @PostMapping
     @PreAuthorize("hasAnyRole('OPERADOR', 'GERENTE')")
+    @Operation(summary = "Salvar", description = "Cadastrar um livro")
+    @ApiResponses({
+    	@ApiResponse(responseCode = "200", description = "Livro criado com sucesso"),
+        @ApiResponse(responseCode = "400", description = "Sintaxe da requisição inválida"),
+        @ApiResponse(responseCode = "401", description = "Não autenticado"),
+        @ApiResponse(responseCode = "422", description = """
+            Erro de validação semântica:
+            - Data de publicação futura
+            - Preço faltando para livros a partir de 2020
+            - Formato de ISBN inválido
+            """),
+        @ApiResponse(responseCode = "409", description = "ISBN já cadastrado"),
+        @ApiResponse(responseCode = "403", description = "Acesso negado"),
+        @ApiResponse(responseCode = "500", description = "Ocorreu um erro inesperado. Entre em contato com a administração.")
+    })
     public ResponseEntity<Void> salvar(@RequestBody @Valid CadastroLivroDTO dto) {
         Livro livro = mapper.toEntity(dto);
         service.salvar(livro);
@@ -43,6 +63,15 @@ public class LivroController implements GenericController {
 
     @GetMapping("{id}")
     @PreAuthorize("hasAnyRole('OPERADOR', 'GERENTE')")
+    @Operation(summary = "Consultar", description = "Consultar um livro por ID")
+    @ApiResponses({
+    	    @ApiResponse(responseCode = "200", description = "Livro encontrado."),
+    	    @ApiResponse(responseCode = "403", description = "Acesso negado."),
+    	    @ApiResponse(responseCode = "401", description = "Não autenticado"),
+    	    @ApiResponse(responseCode = "404", description = "Livro não encontrado."),
+    	    @ApiResponse(responseCode = "422", description = "ID em formato UUID inválido."),
+    	    @ApiResponse(responseCode = "500", description = "Ocorreu um erro inesperado. Entre em contato com a administração.")
+    	})
     public ResponseEntity<ResultadoPesquisaLivroDTO> obterDetalhes(
             @PathVariable("id") String id){
         return service.obterPorId(UUID.fromString(id))
@@ -54,6 +83,15 @@ public class LivroController implements GenericController {
 
     @DeleteMapping("{id}")
     @PreAuthorize("hasAnyRole('OPERADOR', 'GERENTE')")
+    @Operation(summary = "Deletar", description = "Deletar um livro por ID")
+    @ApiResponses(value = {
+    	    @ApiResponse(responseCode = "204", description = "Livro excluído com sucesso."),
+    	    @ApiResponse(responseCode = "403", description = "Acesso negado."),
+    	    @ApiResponse(responseCode = "401", description = "Não autenticado"),
+    	    @ApiResponse(responseCode = "404", description = "Livro não encontrado."),
+    	    @ApiResponse(responseCode = "422", description = "ID em formato inválido."),
+    	    @ApiResponse(responseCode = "500", description = "Ocorreu um erro inesperado. Entre em contato com a administração.")
+    	})
     public ResponseEntity<Object> deletar(@PathVariable("id") String id){
         return service.obterPorId(UUID.fromString(id))
                 .map(livro -> {
@@ -64,6 +102,15 @@ public class LivroController implements GenericController {
 
     @GetMapping
     @PreAuthorize("hasAnyRole('OPERADOR', 'GERENTE')")
+    @Operation(summary = "Busca Paginada", description = "Bucar livros de forma paginada.")
+    @ApiResponses({
+    	    @ApiResponse(responseCode = "200", description = "Lista de autores retornada com sucesso"),
+    	    @ApiResponse(responseCode = "400", description = "Parâmetros de paginação inválidos"),
+    	    @ApiResponse(responseCode = "401", description = "Não autenticado"),
+    	    @ApiResponse(responseCode = "422", description = "Filtros em formato inválido (datas, valores incorretos)"),
+    	    @ApiResponse(responseCode = "401", description = "Acesso não autorizado"),
+    	    @ApiResponse(responseCode = "500", description = "Ocorreu um erro inesperado. Entre em contato com a administração.")
+    	})
     public ResponseEntity<Page<ResultadoPesquisaLivroDTO>> pesquisa(
             @RequestParam(value = "isbn", required = false)
             String isbn,
@@ -90,6 +137,21 @@ public class LivroController implements GenericController {
 
     @PutMapping("{id}")
     @PreAuthorize("hasAnyRole('OPERADOR', 'GERENTE')")
+    @Operation(summary = "Atualizar", description = "Atualizar um livro.")
+    @ApiResponses({
+    	    @ApiResponse(responseCode = "200", description = "Livro atualizado"),
+    	    @ApiResponse(responseCode = "400", description = "Sintaxe inválida"),
+    	    @ApiResponse(responseCode = "401", description = "Não autenticado"),
+    	    @ApiResponse(responseCode = "422", description = """
+    	        Erro de validação:
+    	        - Data futura
+    	        - Preço obrigatório pós-2020
+    	        - Autor inexistente
+    	        """),
+    	    @ApiResponse(responseCode = "409", description = "ISBN duplicado em outra obra."),
+    	    @ApiResponse(responseCode = "404", description = "Livro não encontrado."),
+    	    @ApiResponse(responseCode = "500", description = "Ocorreu um erro inesperado. Entre em contato com a administração.")
+    	})
     public ResponseEntity<Object> atualizar(
             @PathVariable("id") String id, @RequestBody @Valid CadastroLivroDTO dto){
         return service.obterPorId(UUID.fromString(id))

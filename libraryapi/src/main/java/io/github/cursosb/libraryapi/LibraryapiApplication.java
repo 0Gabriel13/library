@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 //Tive que implementar o reconhecimento dos pacotes manualmente pois estava gerando erro do Mapstruck ao subir a aplicação.
 @SpringBootApplication(scanBasePackages = {
+		"io.github.cursosb.libraryapi",
 		"io.github.cursosb.libraryapi.config",
 		"io.github.cursosb.libraryapi.controller",
 		"io.github.cursosb.libraryapi.controller.common",

@@ -1,6 +1,17 @@
 spring:
   application:
     name: libraryapi
+    thymeleaf:
+    cache: false # Desativa cache em desenvolvimento
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML
+    encoding: UTF-8
+    servlet:
+      content-type: text/html
+  output:
+    ansi:
+      enabled: ALWAYS
   datasource:
     url: jdbc:postgresql://localhost:5432/library
     username: postgres
@@ -20,7 +31,45 @@ spring:
           google:
             client-id: ${GOOGLE_CLIENT_ID}
             client-secret: ${GOOGLE_CLIENT_SECRET}
-            scope:
-              - openid
-              - profile
-              - email
+     
+logging:
+  pattern:
+  # modificar data e cores dos logs:
+    console: '%clr(%d{dd-MM-yyyy HH:mm:ss}){magenta} %clr(%5p) %clr([library]){faint} %clr(%-40.40logger){cyan} %clr(:){yellow} %m%n'
+  file:
+    name: libraryAPI.log
+  level:
+    root: warn 
+    io:
+      github:
+         cursosb: trace
+    org:
+      springframework:
+        web: debug
+        security: trace
+        
+        
+# |HIERARQUIA DE LOGS:|
+# trace
+# debug
+# info
+# warn
+# error
+
+
+# Utilizando o Actuator para obter métricas da aplicação:
+management:
+  server:
+    port: 9090
+  endpoints: 
+    web:
+      exposure:
+        include: '*' 
+        
+        
+springdoc:
+  override-with-generic-response: false  
+              
+                
+              
+              

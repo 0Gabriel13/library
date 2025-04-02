@@ -8,7 +8,7 @@ import io.github.cursosb.libraryapi.model.Autor;
 
 @Mapper(componentModel = "spring")
 public interface AutorMapper {
-
+//
     @Mapping(source = "nome", target = "nome")
     @Mapping(source = "dataNascimento", target = "dataNascimento")
     @Mapping(source = "nacionalidade", target = "nacionalidade")

@@ -5,7 +5,8 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 import io.github.cursosb.libraryapi.model.GeneroLivro;
-
+import io.swagger.v3.oas.annotations.media.Schema;
+@Schema(name = "Resultado de pesquisa")
 public record ResultadoPesquisaLivroDTO(
         UUID id,
         String isbn,

@@ -1,14 +1,10 @@
 package io.github.cursosb.libraryapi.controller.common;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -20,15 +16,19 @@ import io.github.cursosb.libraryapi.controller.dto.ErroResposta;
 import io.github.cursosb.libraryapi.exceptions.CampoInvalidoException;
 import io.github.cursosb.libraryapi.exceptions.OperacaoNaoPermitidaException;
 import io.github.cursosb.libraryapi.exceptions.RegistroDuplicadoException;
+import lombok.extern.slf4j.Slf4j;
 
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
     // Tratamento para erros de validação (Bean Validation)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     public ErroResposta handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
-        List<FieldError> fieldErrors = e.getFieldErrors();
+        log.error("Erro de validação: {}", e.getMessage()); //Exibindo mensagem de erro no console 
+        
+    	List<FieldError> fieldErrors = e.getFieldErrors();
         List<ErroCampo> listaErros = fieldErrors
                 .stream()
                 .map(fe -> new ErroCampo(fe.getField(), fe.getDefaultMessage()))

@@ -43,4 +43,6 @@ public interface LivroRepository extends JpaRepository<Livro, UUID> {
     
     @Query("SELECT l FROM Livro l JOIN l.autor a WHERE UPPER(a.nome) LIKE UPPER(CONCAT('%', :nome, '%'))")
     Page<Livro> findByNomeAutorLike(@Param("nome") String nomeAutor, Pageable pageable);
+    
+    
 }
