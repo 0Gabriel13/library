@@ -1,6 +1,8 @@
 spring:
   application:
     name: libraryapi
+##  profiles:
+##    active: homologacao
     thymeleaf:
     cache: false # Desativa cache em desenvolvimento
     prefix: classpath:/templates/
@@ -13,9 +15,9 @@ spring:
     ansi:
       enabled: ALWAYS
   datasource:
-    url: jdbc:postgresql://localhost:5432/library
-    username: postgres
-    password: pgtest123
+    url: ${DATASOURCE_URL:jdbc:postgresql://localhost:5432/library}
+    username: ${DATASOURCE_USERNAME:postgres}
+    password: ${DATASOURCE_PASSWORD:pgtest123}
     driver-class-name: org.postgresql.Driver
   jpa:
     show-sql: true
