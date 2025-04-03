@@ -42,7 +42,7 @@ import io.github.cursosb.libraryapi.security.CustomAuthentication;
 @EnableMethodSecurity
 public class AuthorizationServerConfiguration {
 
-	
+	//
 	//Configuração para habilitar o AuthorizationServer e hablitar e configurar o TokenJWT	
 	@Bean
 	@Order(1)

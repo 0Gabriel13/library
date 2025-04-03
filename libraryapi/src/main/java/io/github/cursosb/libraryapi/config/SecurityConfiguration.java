@@ -17,7 +17,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 import io.github.cursosb.libraryapi.security.JwtCustomAuthenticationFilter;
 import io.github.cursosb.libraryapi.security.LoginSocialSuccessHandler;
-
+//
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true) //Metodo para funcionar o @PreAuthorize nos controllers
